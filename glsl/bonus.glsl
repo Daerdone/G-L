@@ -16,8 +16,6 @@ vec3 sampleWaterNormalMap(vec2 uv)
     vec3 n = texture(iChannel0, uv).xyz * 2.0 - 1.0;
     return vec3(n.x, n.z, n.y);
 }
-
-// Transforms
 vec3 rotateY(vec3 p, float a) {
    a = 10.0*a;
    return vec3(p.x*cos(a)-p.z*sin(a),p.y,p.x*sin(a)+p.z*cos(a));
