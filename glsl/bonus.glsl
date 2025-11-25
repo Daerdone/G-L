@@ -8,11 +8,17 @@ const float seaLevel = -0.4;
 const float speed = 0.18; // Speed of water movement    
 const vec3 sunPos = vec3(10, 1, 1);
 
+// Transforms
+vec3 rotateY(vec3 p, float a)
+{
+   a = 10.0*a;
+   return vec3(p.x*cos(a)-p.z*sin(a),p.y,p.x*sin(a)+p.z*cos(a));
+}
+
 // NOISE FUNCTIONS
 
 // hash function for a 2D position
-vec2 hash( vec2 p ) 
-{
+vec2 hash( vec2 p ) {
 	p = vec2( dot(p,vec2(127.1,311.7)),
 			  dot(p,vec2(269.5,183.3)) );
 
@@ -20,8 +26,7 @@ vec2 hash( vec2 p )
 }
 
 // simple noise with values between -1 and 1, and with a base spatial frequency of 1
-float noise( in vec2 p )
-{
+float noise( in vec2 p ) {
     const float K1 = 0.366025404; // (sqrt(3)-1)/2;
     const float K2 = 0.211324865; // (3-sqrt(3))/6;
 
@@ -39,8 +44,7 @@ float noise( in vec2 p )
     return dot( n, vec3(70.0) );
 }
 
-float ridged(vec2 p)
-{
+float ridged(vec2 p) {
     return 1.0*(0.5-abs(0.5-noise(p)));
 }
 
@@ -61,17 +65,16 @@ float turbulence(in vec2 p, in float amplitude, in float fbase, in float attenua
     return res;
 }
 
-float WaterTurbulence(in vec2 p, in float amplitude, in float fbase, in float attenuation, in int noctave) {
+float WaterTurbulence(in vec2 p, in float amplitude, in float fbase, in float attenuation, in int noctave, in vec3 direction) {
     int i;
     float res = 0.0;
-    const vec3 direction = vec3(1, 0, 0.5);
     float f = fbase;
     float s = speed;
     for (i=0;i<noctave;i++) {       
         res = res + amplitude*noise(f*(p + iTime*s*direction.xz));
         amplitude = amplitude*attenuation;
         f = f*2.0;
-        s *= 1.15;
+        s *= -1.15;
     }
     return res;
 }
@@ -87,18 +90,12 @@ float Terrain(vec3 p)
 
 float Water(vec3 p)
 {
-    float noiseValue = WaterTurbulence(p.xz, 0.3, 0.20, 0.4, 5);
+    vec3 direction = vec3(1, 0, 0.5);
+    float noiseValue = WaterTurbulence(p.xz, 0.05, 0.8, 0.45, 3, direction)/2.;
+    direction = rotateY(direction, 1.);
+    noiseValue += WaterTurbulence(p.xz, 0.05, 0.8, 0.45, 3, direction)/2.;
     return noiseValue + seaLevel - p.y;
 }
-
-// Transforms
-vec3 rotateY(vec3 p, float a)
-{
-   a = 10.0*a;
-   return vec3(p.x*cos(a)-p.z*sin(a),p.y,p.x*sin(a)+p.z*cos(a));
-}
-
-
 
 // p : point
 vec3 TerrainNormal(in vec3 p )
