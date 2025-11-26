@@ -1,5 +1,5 @@
 #iChannel0 "file://water_normal_map.png"
-#iChannel1 "self"
+#iChannel1 "self" // permet de lire les pixels de l'image précédente, pour y stocker la position et l'orientation de la caméra
 #iKeyboard
 
 const int Steps = 500;
@@ -303,15 +303,8 @@ vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, int s, vec3 animatedSunPos)
     return c;
 }
 
-// MAIN
-
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
+bool moveCamera(in vec2 fragCoord, out vec3 rd, out vec3 ro, out vec4 dataToStore)
 {
-    vec3 animatedSunPos = rotateY(sunPos, iTime*0.06);
-
-    vec2 pixel = (gl_FragCoord.xy / iResolution.xy)*2.0-1.0;
-    float asp = iResolution.x / iResolution.y;
-
     vec4 stored = texture(iChannel1, vec2(0.5) / iResolution.xy);
     vec3 camPos = stored.xyz;
     float yaw = stored.w;
@@ -343,9 +336,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     vec3 forward = camMat[2];
     vec3 right = camMat[0];
 
-    float dt = iTimeDelta;
     vec3 moveDir = vec3(0.0);
     
+    float dt = iTimeDelta;
     if (isKeyDown(Key_Shift)) dt *= 5.0;
 
     if (isKeyDown(Key_Z)) moveDir += forward;
@@ -359,25 +352,45 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         camPos += normalize(moveDir) * moveSpeed * dt;
     }
 
-    if (fragCoord.x < 1.0 && fragCoord.y < 1.0) {
-        fragColor = vec4(camPos, yaw);
-        return;
-    }
-    if (fragCoord.x < 2.0 && fragCoord.x >= 1.0 && fragCoord.y < 1.0) {
-        fragColor = vec4(pitch, prevMouse);
-        return;
-    }
+    vec4 storeData1 = vec4(camPos, yaw);
+    vec4 storeData2 = vec4(pitch, prevMouse);
 
-    vec3 rd = normalize(vec3(asp*pixel.x, pixel.y, 2.0));
+    vec2 pixel = (gl_FragCoord.xy / iResolution.xy)*2.0-1.0;
+    float aspectRatio = iResolution.x / iResolution.y;
+    rd = normalize(vec3(aspectRatio*pixel.x, pixel.y, 2.0));
     rd = camMat * rd;
-    vec3 ro = camPos;
+    ro = camPos;
+
+    if (fragCoord.x < 1.0 && fragCoord.y < 1.0) 
+    {
+        dataToStore = storeData1;
+        return true;
+    }
+    if (fragCoord.x < 2.0 && fragCoord.x >= 1.0 && fragCoord.y < 1.0) 
+    {
+        dataToStore = storeData2;
+        return true;
+    }
+    return false;
+}
+
+// MAIN
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+    vec3 rd, ro;
+    vec4 dataToStore;
+    
+    if (moveCamera(fragCoord, rd, ro, dataToStore)) {
+        fragColor = dataToStore;
+        return;
+    }
 
     bool hitTerrain, hitWater;
     int s;
-
     float t = TraceObject(ro, rd, hitTerrain, hitWater, s);
     vec3 pos = ro+t*rd;
-    
+    vec3 animatedSunPos = rotateY(sunPos, iTime*0.06);
     float sunAngle = 0.999;
 
     vec3 rgb = background(rd);
