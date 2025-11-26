@@ -16,6 +16,8 @@ vec3 sunPos = normalize(vec3(0, 1, 5));
 const float moveSpeed = 3.0;
 const float mouseSensitivity = 3.0;
 
+const float sunAngle = 0.001;
+
 
 vec3 sampleWaterNormalMap(vec2 uv)
 {
@@ -248,32 +250,30 @@ vec3 background(vec3 rd)
 // Shading and lighting
 // p : point,
 // n : normal at point
-vec3 ShadeTerrain(vec3 p, vec3 n, vec3 animatedSunPos)
+vec3 ShadeTerrain(vec3 p, vec3 n, vec3 animatedSunPos, bool isShadowed, float sunDistance)
 {
     // point light
     const vec3 lightColor = vec3(1.0, 1.0, 1.0);
     
     vec3 objectColor = mix(vec3(0.6, 0.6, 0.1), vec3(0.05, 0.6, 0.05), p.y);
 
-    float dot = dot(-n, animatedSunPos);
+    float dotP = dot(-n, animatedSunPos);
 
     vec3 c;
-    if (dot < 0.0) // Ombre
+    if (dotP < 0.0 || isShadowed) // Ombre
     {
-        c = mix(objectColor*0.4, objectColor*0.3, dot);
+        c = mix(objectColor*0.4, objectColor*0.3, dotP);
     }
     else // Lumiere
     {
-        c = lightColor*mix(objectColor*0.5, (0.1 + 1.2*objectColor), dot);
+        c = lightColor*mix(objectColor*0.5, (0.1 + 1.2*objectColor), dotP);
     }
     return c;
 }
 
-vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, vec3 animatedSunPos)
+vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, vec3 animatedSunPos, bool castedShadow, float sunDistance)
 {
-    // point light
-    const vec3 lightColor = vec3(1, 1, 1);
-    
+    const vec3 sunColor = vec3(1, 1, 1);
     vec3 objectColor = vec3(0.5, 0.7, .9);
 
     // Specular
@@ -285,17 +285,17 @@ vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, vec3 animatedSunPos)
     // Diffuse
     float dotP = dot(normalize(n), normalize(animatedSunPos));
 
-    vec3 diffuseColor;
-    if (dotP < 0.0) // Ombre
-    {
-        diffuseColor = mix(objectColor*0.7, objectColor*0.6, dotP);
-    }
-    else // Lumiere
-    {
-        diffuseColor = lightColor*mix(objectColor*0.75, (0.1 + 1.2*objectColor), dotP);
-    }
+    castedShadow = castedShadow && (dotP > 0.0);
+    bool normalShadow = (dotP <= 0.0);
+
+    vec3 lightColor = sunColor*mix(objectColor*0.75, (0.1 + 1.2*objectColor), dotP);
+    vec3 shadowColor = mix(objectColor*0.7, objectColor*0.6, dotP);
+    vec3 castedShadowColor = mix(shadowColor, lightColor, min(sunDistance * 0.15, 1.0));
+
+    vec3 diffuseColor = normalShadow ? shadowColor : castedShadow ? castedShadowColor : lightColor;
 
     vec3 c = 0.9*diffuseColor + specularColor*specular;
+
     return c;
 }
 
@@ -382,43 +382,36 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         return;
     }
 
+    vec3 rgb = background(rd);
+
+    // Premier rayon pour déterminer les objets touchés
+
     bool hitTerrain, hitWater;
     float distance = TraceObject(ro, rd, hitTerrain, hitWater);
-
     vec3 pos = ro+distance*rd;
-    vec3 animatedSunPos = rotateY(sunPos, iTime*0.06);
 
-    vec3 rgb = background(rd);
+    // Deuxième rayon pour savoir si cette position est éclairée par le soleil
+
+    vec3 animatedSunPos = normalize(rotateY(sunPos, iTime*0.06));
+    bool isShadowed;
+    float sunDistance = TraceSun(pos, animatedSunPos, isShadowed);
     if (hitTerrain || hitWater)
     {   
         if (hitTerrain)
         {
             vec3 n = TerrainNormal(pos);
-            rgb = ShadeTerrain(pos, n, animatedSunPos);
+            rgb = ShadeTerrain(pos, n, animatedSunPos, isShadowed, sunDistance);
         }
         else if (hitWater)
         {
             vec3 n = WaterNormal(pos);
-            rgb = ShadeWater(pos, n, rd, animatedSunPos);
+            rgb = ShadeWater(pos, n, rd, animatedSunPos, isShadowed, sunDistance);
         }
-
-
-        // Deuxième rayon en direction du soleil pour créer des ombres portées
-        
-        bool hitObject;
-        float t = TraceSun(pos, normalize(animatedSunPos), hitObject);
-
-        if (hitObject)
-        {
-            rgb -= (0.3, 0.3, 0.3)/exp(t);
-        }
-
     }
 
-    float sunAngle = 0.999;
-    else if (dot(rd, animatedSunPos) > sunAngle)
+    else if (dot(rd, animatedSunPos) > 1.-sunAngle)
     {
-        float f = smoothstep(sunAngle, 1.0, dot(rd, animatedSunPos));
+        float f = smoothstep(1.-sunAngle, 1.0, dot(rd, animatedSunPos));
         vec3 sunColor = vec3(1.0, 0.9, 0.6);
         rgb += sunColor*f*f;
     }
