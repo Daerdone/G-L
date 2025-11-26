@@ -159,8 +159,7 @@ vec3 WaterNormal(in vec3 p )
 // o : ray origin
 // u : ray direction
 // h : hit
-// s : Number of steps
-float TraceObject(vec3 o, vec3 u, out bool hitTerrain, out bool hitWater, out int s)
+float TraceObject(vec3 o, vec3 u, out bool hitTerrain, out bool hitWater)
 {
     hitTerrain = false;
     hitWater = false;
@@ -171,7 +170,6 @@ float TraceObject(vec3 o, vec3 u, out bool hitTerrain, out bool hitWater, out in
 
     for(int i=0; i<Steps; i++)
     {
-        s=i;
         vec3 p = o+t*u;
       
         float vTerrain = Terrain(p);
@@ -181,13 +179,11 @@ float TraceObject(vec3 o, vec3 u, out bool hitTerrain, out bool hitWater, out in
         // Hit terrain 
         if (vTerrain > 0.0)
         {
-            s=i;
             hitTerrain = true;
             break;
         }
         if (vWater > 0.0)
         {
-            s=i;
             hitWater = true;
             break;
         }
@@ -252,7 +248,7 @@ vec3 background(vec3 rd)
 // Shading and lighting
 // p : point,
 // n : normal at point
-vec3 ShadeTerrain(vec3 p, vec3 n, int s, vec3 animatedSunPos)
+vec3 ShadeTerrain(vec3 p, vec3 n, vec3 animatedSunPos)
 {
     // point light
     const vec3 lightColor = vec3(1.0, 1.0, 1.0);
@@ -273,7 +269,7 @@ vec3 ShadeTerrain(vec3 p, vec3 n, int s, vec3 animatedSunPos)
     return c;
 }
 
-vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, int s, vec3 animatedSunPos)
+vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, vec3 animatedSunPos)
 {
     // point light
     const vec3 lightColor = vec3(1, 1, 1);
@@ -387,11 +383,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     }
 
     bool hitTerrain, hitWater;
-    int s;
-    float t = TraceObject(ro, rd, hitTerrain, hitWater, s);
-    vec3 pos = ro+t*rd;
+    float distance = TraceObject(ro, rd, hitTerrain, hitWater);
+
+    vec3 pos = ro+distance*rd;
     vec3 animatedSunPos = rotateY(sunPos, iTime*0.06);
-    float sunAngle = 0.999;
 
     vec3 rgb = background(rd);
     if (hitTerrain || hitWater)
@@ -399,17 +394,19 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         if (hitTerrain)
         {
             vec3 n = TerrainNormal(pos);
-            rgb = ShadeTerrain(pos, n, s, animatedSunPos);
+            rgb = ShadeTerrain(pos, n, animatedSunPos);
         }
         else if (hitWater)
         {
             vec3 n = WaterNormal(pos);
-            rgb = ShadeWater(pos, n, rd, s, animatedSunPos);
+            rgb = ShadeWater(pos, n, rd, animatedSunPos);
         }
 
-        rd = normalize(animatedSunPos);
+
+        // Deuxième rayon en direction du soleil pour créer des ombres portées
+        
         bool hitObject;
-        float t = TraceSun(pos, rd, hitObject);
+        float t = TraceSun(pos, normalize(animatedSunPos), hitObject);
 
         if (hitObject)
         {
@@ -418,6 +415,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 
     }
 
+    float sunAngle = 0.999;
     else if (dot(rd, animatedSunPos) > sunAngle)
     {
         float f = smoothstep(sunAngle, 1.0, dot(rd, animatedSunPos));
