@@ -11,7 +11,7 @@ const float rA=1.0;
 const float rB=50.0;
 const float seaLevel = -0.2;
 const float WaterSpeed = 0.18;
-vec3 sunPos = normalize(vec3(0, 1, 5));
+vec3 sunPos = normalize(vec3(0, 3, 5));
 
 const float moveSpeed = 3.0;
 const float mouseSensitivity = 3.0;
@@ -290,7 +290,7 @@ vec3 ShadeWater(vec3 p, vec3 n, vec3 rd, vec3 animatedSunPos, bool castedShadow,
 
     vec3 lightColor = sunColor*mix(objectColor*0.75, (0.1 + 1.2*objectColor), dotP);
     vec3 shadowColor = mix(objectColor*0.7, objectColor*0.6, dotP);
-    vec3 castedShadowColor = mix(shadowColor, lightColor, min(sunDistance * 0.15, 1.0));
+    vec3 castedShadowColor = shadowColor; //mix(shadowColor, lightColor, min(sunDistance * 0.15, 1.0));
 
     vec3 diffuseColor = normalShadow ? shadowColor : castedShadow ? castedShadowColor : lightColor;
 
