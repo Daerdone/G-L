@@ -4,8 +4,10 @@
 
 const float Epsilon = 0.01;
 
-const float minRenderDistance=0.5;
+const float minRenderDistance=1.0;
 const float maxRenderDistance=35.0; // = render distance
+const float minShadowDistance=0.05;
+const float maxShadowDistance=10.0; // = max distance between an object and its shadow
 const float seaLevel = -0.2;
 const float WaterSpeed = 0.18;
 vec3 sunPos = normalize(vec3(0, 3, 5));
@@ -107,9 +109,9 @@ float WaterTurbulence(in vec2 p, in float amplitude, in float fbase, in float at
 
 // TERRAIN FUNCTIONS
 
-float Terrain(vec3 p)
+float Terrain(vec3 p, int nbOctaves)
 {
-    float noiseValue = turbulence(p.xz, 2.5, 0.1, 0.46, 8);
+    float noiseValue = turbulence(p.xz, 2.5, 0.1, 0.46, nbOctaves);
     
     return noiseValue - p.y;
 }
@@ -128,10 +130,10 @@ vec3 TerrainNormal(in vec3 p )
 {
     float eps = 0.0001;
     vec3 n;
-    float v = Terrain(p);
-    n.x = Terrain( vec3(p.x+eps, p.y, p.z) ) - v;
-    n.y = Terrain( vec3(p.x, p.y+eps, p.z) ) - v;
-    n.z = Terrain( vec3(p.x, p.y, p.z+eps) ) - v;
+    float v = Terrain(p, 8);
+    n.x = Terrain( vec3(p.x+eps, p.y, p.z), 8 ) - v;
+    n.y = Terrain( vec3(p.x, p.y+eps, p.z), 8 ) - v;
+    n.z = Terrain( vec3(p.x, p.y, p.z+eps), 8 ) - v;
     return normalize(n);
 }
 
@@ -155,20 +157,20 @@ vec3 WaterNormal(in vec3 p )
 }
 
 // Trace ray using ray marching
-float Raytrace(vec3 o, vec3 u, int maxRaySteps, out bool hitTerrain, out bool hitWater)
+float Raytrace(vec3 o, vec3 u, int maxRaySteps, float minDistance, float maxDistance, out bool hitTerrain, out bool hitWater)
 {
     hitTerrain = false;
     hitWater = false;
 
     // Don't start at the origin
     // instead move a little bit forward
-    float t=minRenderDistance;
+    float t=minDistance;
 
     for(int i=0; i<maxRaySteps; i++)
     {
         vec3 p = o+t*u;
       
-        float vTerrain = Terrain(p);
+        float vTerrain = Terrain(p, 6);
         float vWater = Water(p);
        
         
@@ -188,7 +190,7 @@ float Raytrace(vec3 o, vec3 u, int maxRaySteps, out bool hitTerrain, out bool hi
         t += max(Epsilon, min(-vTerrain, -vWater)/2.0);  
 
         // Escape marched far away
-        if (t>maxRenderDistance)
+        if (t>maxDistance)
         {
             break;
         }
@@ -338,19 +340,20 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
         return;
     }
 
-    vec3 rgb = background(rd);
+    vec3 backgroundColor = background(rd);
+    vec3 rgb = backgroundColor;
 
     // Premier rayon pour déterminer les objets touchés
 
     bool isTerrain, isWater;
-    float distance = Raytrace(ro, rd, 1000, isTerrain, isWater);
+    float distance = Raytrace(ro, rd, 170, minRenderDistance, maxRenderDistance, isTerrain, isWater);
     vec3 pos = ro+distance*rd;
 
     // Deuxième rayon pour savoir si cette position est éclairée par le soleil
 
     bool isShadowedByTerrain, isShadowedByWater;
     vec3 animatedSunPos = normalize(rotateY(sunPos, iTime*0.06));
-    float sunDistance = Raytrace(pos, animatedSunPos, 60, isShadowedByTerrain, isShadowedByWater);
+    float sunDistance = Raytrace(pos, animatedSunPos, 70, minShadowDistance, maxShadowDistance, isShadowedByTerrain, isShadowedByWater);
     bool isShadowed = isShadowedByTerrain || isShadowedByWater;    
     if (isTerrain || isWater)
     {   
@@ -364,6 +367,10 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             vec3 n = WaterNormal(pos);
             rgb = ShadeWater(pos, n, rd, animatedSunPos, isShadowed, sunDistance);
         }
+
+        // Ajout de brouillard
+        float fogginess = smoothstep(0.95, 1.0, distance / maxRenderDistance);
+        rgb = mix(rgb, backgroundColor, fogginess);
     }
 
     else if (dot(rd, animatedSunPos) > 1.-sunAngle)
