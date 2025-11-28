@@ -25,19 +25,26 @@ public:
 //----------------------------------------------------- Méthodes publiques
     void Print() const;
     // Mode d'emploi :
-    
+    //
     // Contrat :
+    //
+
+    void AddTrajet(const char * start, const char * end, const char * moyenDeTransport);
+    // Mode d'emploi :
+    //
+    // Contrat d'efficacité :
+    //     Il faut que le trajet soit valide, c'est à dire que chaque ville de départ soit la ville d'arrivée du trajet précédent.
 
 //------------------------------------------------- Surcharge d'opérateurs
 
 //-------------------------------------------- Constructeurs - destructeur
 
 
-    TrajetCompose (ListeDeTrajet* ldt);
+    TrajetCompose ();
     // Mode d'emploi :
     // 
     // Contrat :
-    // Il faut que la ListeDeTrajet ldt soit valide, c'est à dire que chaque ville d'arrivée soit la ville de départ du trajet suivant.
+    // 
 
     virtual ~TrajetCompose ( );
     // Mode d'emploi :
@@ -52,7 +59,7 @@ protected:
 
 //----------------------------------------------------- Attributs protégés
 
-    ListeDeTrajet* listeDeTrajet;
+    ListeDeTrajet *listeDeTrajet;
 };
 
 //-------------------------------- Autres définitions dépendantes de <TrajetCompose>
