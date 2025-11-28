@@ -33,6 +33,8 @@ TrajetSimple::TrajetSimple(const char* start, const char* end, const char* Trans
         cout << "Appel au constructeur de <TrajetSimple>" << endl;
     #endif
 
+    moyenDeTransport = new char[100];
+
     strcpy(moyenDeTransport, Transport);
 }
 
@@ -44,6 +46,8 @@ TrajetSimple::~TrajetSimple ( )
     #ifdef MAP
         cout << "Appel au destructeur de <TrajetSimple>" << endl;
     #endif
+
+    delete [] moyenDeTransport;
 }
 
 

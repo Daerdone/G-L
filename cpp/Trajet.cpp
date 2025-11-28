@@ -40,6 +40,9 @@ Trajet::~Trajet ( )
     #ifdef MAP
         cout << "Appel au destructeur de <Trajet>" << endl;
     #endif
+
+    delete [] start;
+    delete [] end;
 } 
 
 
@@ -53,7 +56,9 @@ Trajet::Trajet (const char *startIn, const char *endIn)
         cout << "Appel au constructeur de <Trajet>" << endl;
     #endif
 
+    start = new char[100];
+    end = new char[100];
+
     strcpy(start, startIn);
     strcpy(end, endIn);
 }
-

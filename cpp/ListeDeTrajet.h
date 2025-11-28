@@ -59,7 +59,11 @@ public:
     // Contrat :
     // 
 
-
+    void Add (const Trajet * newTrajet);
+    // Mode d'emploi :
+    //
+    // Contrat :
+    //
 
 //------------------------------------------------- Surcharge d'opérateurs
 
@@ -80,23 +84,11 @@ public:
 
 protected:
 //----------------------------------------------------- Méthodes protégées
-    void Add (const Trajet * newTrajet);
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
-
-    void Search (const char* start, const char* end, ListeDeTrajet & result) const;
+    void Search (const char* start, const char* end) const;
     // Mode d'emploi :
     //      
     // Contrat :
     // result est une ListeDeTrajet déjà allouée
-
-    TrajetSimple* AskNewTrajetSimple() const;
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
 
 //----------------------------------------------------- Attributs protégés
 

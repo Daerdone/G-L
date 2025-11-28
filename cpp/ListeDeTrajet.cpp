@@ -40,8 +40,7 @@ void ListeDeTrajet::AskNewTrajet()
         cin >> transport;
 
         TrajetSimple* newTrajet = new TrajetSimple(start, end, transport);
-        this->Add(newTrajet);
-
+        Add(newTrajet);
         
     }
     else if (type == 'c')
@@ -76,7 +75,12 @@ void ListeDeTrajet::AskNewTrajet()
             trajetCompose->AddTrajet(start, end, transport);
 
             cout << "Entrez 'stop' pour terminer ou une autre commande pour continuer." << endl;
-        } 
+        }
+        
+        if (trajetCompose->GetEnd() != NULL)
+        {
+            Add(trajetCompose);
+        }
     }
 
     delete[] start;
@@ -96,15 +100,11 @@ void ListeDeTrajet::AskSearch() const
     cin >> start;
     cin >> end;
 
-    ListeDeTrajet* result = new ListeDeTrajet();
-    this->Search(start, end, *result);
-
     cout << "Résultats de la recherche :" << endl;
-    result->Print();
+    this->Search(start, end);
 
     delete[] start;
     delete[] end;
-    delete result;
 }
 
 void ListeDeTrajet::Print() const
@@ -112,9 +112,13 @@ void ListeDeTrajet::Print() const
 //
 {
     elem* current = this->listTrajet;
+    
     while (current != NULL)
     {
-        (current->value)->Print();
+        if (current->value != NULL)
+        {
+            (current->value)->Print();
+        }
         current = current->next;
     }
 }
@@ -185,20 +189,22 @@ void ListeDeTrajet::Add(const Trajet * newTrajet)
 }
 
 
-void ListeDeTrajet::Search(const char* start, const char* end, ListeDeTrajet & result) const
+void ListeDeTrajet::Search(const char* start, const char* end) const
 // Algorithme :
 //
 {
     elem* current = this->listTrajet;
     while (current != NULL)
     {
-        
+        cout << "1" << endl;
         if ((!strcmp(current->value->GetStart(), start))
             && (!strcmp(current->value->GetEnd(), end)))
         {
-            result.Add(current->value);
+            cout << "2" << endl;
+            current->value->Print();
         }
 
+        cout << "3" << endl;
         current = current->next;
     }
 }
