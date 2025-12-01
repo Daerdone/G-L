@@ -112,17 +112,12 @@ float Terrain(vec3 p, int nbOctaves)
 {
     float noiseValue = turbulence(p.xz, 2.5, 0.1, 0.46, nbOctaves);
 
-    float a = 0.15;
+    float a = 0.2;
     float b = -0.19;
-    float c = 8.0;
-    float d = 0.58;
+    float c = 4.;
+    float d = 1.0;
 
-    if (noiseValue > -a)
-    {
-        noiseValue = (noiseValue+a)*d*sqrt(abs(noiseValue+a))+b+(pow(noiseValue+a, 2.0)/(c));
-    } else {
-        noiseValue = (noiseValue+a)*d*sqrt(abs(noiseValue+a))+b-(pow(noiseValue+a, 2.0)/(c-6.));
-    }
+    noiseValue = (noiseValue+a)*d*sqrt(abs(noiseValue+a))+b-(noiseValue*noiseValue)/(c);
 
     return noiseValue - p.y;
 }
@@ -233,7 +228,7 @@ vec3 ShadeTerrain(vec3 p, vec3 n, vec3 animatedSunPos, bool isShadowed, float su
     float grassness = 0.2;
     float snowHeight = 1.9;
     float flatness = clamp(abs(dot(TerrainNormal(p, 3), vec3(0,1,0))) + grassness, 0.0, 1.0);
-    vec3 objectColor = mix(sandColor, grassColor, clamp(pow(p.y + 0.8 , 5.0), 0.0, 1.0)); // sand
+    vec3 objectColor = mix(sandColor, grassColor, clamp(pow(p.y + 0.85 , 5.0), 0.0, 1.0)); // sand
     objectColor = mix(snowColor, objectColor, pow(clamp((snowHeight - p.y), 0.0, 1.0), 5.0)); // snow
     objectColor = mix(rockColor, objectColor, pow(flatness, rockSmoothness)); // rock
 
