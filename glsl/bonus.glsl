@@ -219,7 +219,7 @@ vec3 ShadeTerrain(vec3 p, vec3 n, vec3 animatedSunPos, bool isShadowed, float su
     // ROCHE ET SABLE ET SNOW
     float rockSmoothness = 10.0;
     float grassness = 0.2;
-    float snowHeight = 1.7;
+    float snowHeight = 1.9;
     float flatness = clamp(abs(dot(TerrainNormal(p, 3), vec3(0,1,0))) + grassness, 0.0, 1.0);
     vec3 objectColor = mix(sandColor, grassColor, clamp(pow(p.y + 0.7 +0.1*Terrain(p+vec3(141, 0, 5937), 3), 5.0), 0.0, 1.0)); // sand
     objectColor = mix(snowColor, objectColor, pow(clamp((snowHeight - p.y), 0.0, 1.0), 5.0)); // snow
