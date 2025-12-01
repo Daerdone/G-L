@@ -7,7 +7,7 @@ const float Epsilon = 0.005;
 const float minRenderDistance=1.0;
 const float maxRenderDistance=35.0; // = render distance
 const float minShadowDistance=0.05;
-const float maxShadowDistance=10.0; // = max distance between an object and its shadow
+const float maxShadowDistance=8.0; // = max distance between an object and its shadow
 const float seaLevel = -0.20;
 const float WaterSpeed = 0.18;
 vec3 sunPos = normalize(vec3(0, 3, 5));
