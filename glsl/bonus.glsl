@@ -24,7 +24,6 @@ vec3 sampleWaterNormalMap(vec2 uv)
     return vec3(n.x, n.z, n.y);
 }
 
-// Transforms
 vec3 rotateY(vec3 p, float a) {
     a = 10.0*a;
     return vec3(p.x*cos(a)-p.z*sin(a),p.y,p.x*sin(a)+p.z*cos(a));
@@ -112,7 +111,6 @@ float WaterTurbulence(in vec2 p, in float amplitude, in float fbase, in float at
 float Terrain(vec3 p, int nbOctaves)
 {
     float noiseValue = turbulence(p.xz, 2.5, 0.1, 0.46, nbOctaves);
-
 
     return noiseValue - p.y;
 }
@@ -202,7 +200,7 @@ float Raytrace(vec3 o, vec3 u, int maxRaySteps, float minDistance, float maxDist
 // Background color
 vec3 background(vec3 rd)
 {
-    return mix(vec3(0.8, 0.8, 0.9), vec3(0.6, 0.9, 1.0), rd.y*1.0+0.25);
+    return mix(vec3(0.7, 0.8, 1.0), vec3(0.6, 0.9, 1.0), rd.y*1.0+0.25);
     //return mix(vec3(1, 1, 0), vec3(1, 0, 0)*0.9, rd.y*2.0+0.30);
 }
 
@@ -373,7 +371,7 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
             rgb = ShadeWater(pos, n, rd, animatedSunPos, isShadowed, sunDistance);
         }
 
-        // Ajout de brouillard
+        // Ajout de brouillard de distance
         float fogginess = smoothstep(0.95, 1.0, distance / maxRenderDistance);
         rgb = mix(rgb, backgroundColor, fogginess);
     }
