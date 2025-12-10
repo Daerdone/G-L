@@ -62,7 +62,7 @@ protected:
 	// 		end -> Ville d'arrivée du trajet (peut-être NULL)
 	// 
 	// 		Alloue de la mémoire pour les attributs start et end
-	//		et les initialise avec les attributs en paramètre.
+	//		et les initialise avec les données en paramètre.
 	// Contrat :
     //
 
