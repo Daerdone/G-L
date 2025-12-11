@@ -153,7 +153,6 @@ ListeDeTrajet::ListeDeTrajet()
     endList = NULL;
 }
 
-
 ListeDeTrajet::~ListeDeTrajet ( )
 // Algorithme :
 //
@@ -172,11 +171,6 @@ ListeDeTrajet::~ListeDeTrajet ( )
         current = temp;
     }
 }
-
-
-//------------------------------------------------------------------ PRIVE
-
-//----------------------------------------------------- Méthodes protégées
 
 void ListeDeTrajet::Add(const Trajet * newTrajet)
 // Algorithme :
@@ -197,6 +191,9 @@ void ListeDeTrajet::Add(const Trajet * newTrajet)
     }
 }
 
+//------------------------------------------------------------------ PRIVE
+
+//----------------------------------------------------- Méthodes protégées
 
 void ListeDeTrajet::Search(const char* start, const char* end) const
 // Algorithme :

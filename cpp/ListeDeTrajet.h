@@ -62,6 +62,12 @@ public:
     // Contrat d'efficacité :
     //      La liste n'est pas vide.
 
+    void Add (const Trajet * newTrajet);
+    // Mode d'emploi :
+    //    Ajoute un nouveau trajet à la fin de la liste.
+    // Contrat :
+    //
+
 //------------------------------------------------- Surcharge d'opérateurs
 
 //-------------------------------------------- Constructeurs - destructeur
@@ -84,12 +90,6 @@ protected:
     void Search (const char* start, const char* end) const;
     // Mode d'emploi :
     //      Recherche des trajets entre deux villes données.
-    // Contrat :
-    //
-
-    void Add (const Trajet * newTrajet);
-    // Mode d'emploi :
-    //    Ajoute un nouveau trajet à la fin de la liste.
     // Contrat :
     //
 
