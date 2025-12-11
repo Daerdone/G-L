@@ -87,9 +87,22 @@ protected:
 //----------------------------------------------------- Méthodes protégées
     void Search (const char* start, const char* end) const;
     // Mode d'emploi :
-    //      Recherche des trajets entre deux villes données et les affiche.
+    //      Recherche toutes les combinaisons de trajets du catalogue
+    //      permettant d'aller de start à end, puis les affiche. Affiche
+    //      un message dédié si aucun chemin n'est trouvé.
     // Contrat :
-    //
+    //      start et end ne doivent pas être NULL. 
+
+    void SearchPaths(const char* current, const char* end, const Trajet** trajets, int count, int* used, const Trajet** path, int depth, bool & found) const;
+    // Mode d'emploi :
+    //      Parcours en profondeur avec backtracking sur les trajets
+    //      disponibles : explore chaque segment démarrant à current,
+    //      marque l'entrée pour éviter les cycles, descend récursivement
+    //      et affiche dès que end est atteint.
+    // Contrat :
+    //      trajets, used et path sont des tableaux de taille count,
+    //      depth correspond à la profondeur courante, found passe à true
+    //      dès qu'un chemin complet est identifié.
 
 //----------------------------------------------------- Attributs protégés
 

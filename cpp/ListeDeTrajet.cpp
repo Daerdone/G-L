@@ -44,6 +44,8 @@ void ListeDeTrajet::AskNewTrajet()
         TrajetSimple* newTrajet = new TrajetSimple(start, end, transport);
         Add(newTrajet);
 
+        cout << "Trajet ajouté au catalogue." << endl;
+
         
     }
     else if (type == 'c')
@@ -87,8 +89,13 @@ void ListeDeTrajet::AskNewTrajet()
         }
         else
         {
-            cout << "Erreur lors de l'ajout du trajet au catalogue." << endl;
+            delete trajetCompose;
+            cout << "Trajet vide, donc non ajouté au catalogue." << endl;
         }
+    }
+    else
+    {
+        cout << "Type de trajet inconnu (" << type << "). Retour au menu." << endl;
     }
 }
 
@@ -118,6 +125,13 @@ void ListeDeTrajet::Print(int indLvl) const
 {
     elem* current = this->listTrajet;
     
+    if (current == NULL)
+    {
+        for (int i = 0; i < indLvl; cout << "   ", i++) {} // Indentations
+        cout << "- (Liste vide)" << endl;
+        return;
+    }
+
     while (current != NULL)
     {
         if (current->value != NULL)
@@ -200,17 +214,109 @@ ListeDeTrajet::~ListeDeTrajet ( )
 
 void ListeDeTrajet::Search(const char* start, const char* end) const
 // Algorithme :
-//
+// 1) Compte les trajets disponibles, les range dans un tableau et prépare
+//    deux buffers : un marqueur d'utilisation (évite les cycles) et un
+//    tableau courant représentant le chemin en construction.
+// 2) Lance une recherche en profondeur (SearchPaths) depuis start vers end
+//    en essayant chaque trajet qui commence par la ville courante et qui
+//    n'a pas encore été utilisé. Chaque appel marque le trajet, descend
+//    récursivement et dé-marque en remontant (backtracking).
+// 3) Lorsqu'une destination end est atteinte avec au moins un segment,
+//    affiche le chemin complet. Si aucun chemin n'est trouvé,
+//    affiche un message dédié.
 {
-    elem* current = this->listTrajet;
+    int count = 0;
+    elem* current = listTrajet;
     while (current != NULL)
     {
-        if ((!strcmp(current->value->GetStart(), start))
-            && (!strcmp(current->value->GetEnd(), end)))
-        {
-            current->value->Print();
-        }
-
+        count++;
         current = current->next;
     }
+
+    if (count == 0)
+    {
+        cout << "Aucun trajet disponible." << endl;
+        return;
+    }
+
+    const Trajet** trajets = new const Trajet*[count];
+    int* used = new int[count];
+    const Trajet** path = new const Trajet*[count];
+
+    current = listTrajet;
+    int index = 0;
+    while (current != NULL)
+    {
+        trajets[index] = current->value;
+        used[index] = 0;
+        current = current->next;
+        index++;
+    }
+
+    bool found = false;
+    SearchPaths(start, end, trajets, count, used, path, 0, found);
+
+    if (!found)
+    {
+        cout << "Aucun trajet trouve." << endl;
+    }
+
+    delete[] trajets;
+    delete[] used;
+    delete[] path;
 }
+
+void ListeDeTrajet::SearchPaths(const char* current, const char* end, const Trajet** trajets, int count, int* used, const Trajet** path, int depth, bool & found) const
+// Algorithme :
+// Parcours en profondeur : pour chaque trajet partant de la ville courante
+// et encore libre, on l'ajoute au chemin, on marque l'entrée comme utilisée,
+// on poursuit depuis sa destination, puis on dé-marque en retour. Déclenche
+// l'affichage dès qu'on atteint la ville cible avec un chemin non vide.
+{
+    if (strcmp(current, end) == 0 && depth > 0)
+    {
+        found = true;
+        if (depth == 1)
+        {
+            path[0]->Print();
+        }
+        else
+        {
+            cout << "Trajet complexe :" << endl;
+            for (int i = 0; i < depth; i++)
+            {
+                cout << "   ";
+                path[i]->Print();
+            }
+        }
+        return;
+    }
+
+    for (int i = 0; i < count; i++)
+    {
+        if (used[i])
+        {
+            continue;
+        }
+
+        const Trajet* trajet = trajets[i];
+        const char* trajetStart = trajet->GetStart();
+        const char* trajetEnd = trajet->GetEnd();
+
+        if (trajetStart == NULL || trajetEnd == NULL)
+        {
+            continue;
+        }
+
+        if (strcmp(trajetStart, current) != 0)
+        {
+            continue;
+        }
+
+        used[i] = 1;
+        path[depth] = trajet;
+        SearchPaths(trajetEnd, end, trajets, count, used, path, depth + 1, found);
+        used[i] = 0;
+    }
+}
+

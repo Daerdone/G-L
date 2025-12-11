@@ -15,7 +15,7 @@ int main()
 
     while (true)
     {
-        cout << ">> ";
+        cout << endl << ">> ";
         cin >> command;
 
         if (!strcmp(command, "add"))
@@ -51,6 +51,6 @@ void PrintMenu()
     cout << "- print    : afficher tout le catalogue" << endl;
     cout << "- search   : chercher un trajet dans le catalogue" << endl;
     cout << "- help     : afficher ce menu" << endl;
-    cout << "- bye      : quitter le programme" << endl << endl;
+    cout << "- bye      : quitter le programme" << endl;
 }
 
