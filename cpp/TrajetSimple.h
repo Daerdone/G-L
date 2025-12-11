@@ -32,10 +32,24 @@ public:
     // Contrat :
     //
 
+    const char * GetMoyenDeTransport() const
+    // Mode d'emploi :
+    //      Renvoie le moyen de transport utilisé pour le trajet.
+    // Contrat :
+    //
+    {
+        return moyenDeTransport;
+    }
+
 //------------------------------------------------- Surcharge d'opérateurs
 
 //-------------------------------------------- Constructeurs - destructeur
 
+    TrajetSimple (const TrajetSimple & unTrajetSimple );
+    // Mode d'emploi :
+    //      Constructeur de copie.
+    // Contrat :
+    //
 
     TrajetSimple (const char* start, const char* end, const char* moyenDeTransport);
     // Mode d'emploi :

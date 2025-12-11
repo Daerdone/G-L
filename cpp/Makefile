@@ -2,7 +2,7 @@ CXXFLAGS = -ansi -pedantic -Wall -std=c++11
 
 .PHONY: clean MAP
 
-main: clean main.o Trajet.o TrajetSimple.o TrajetCompose.o ListeDeTrajet.o
+main: main.o Trajet.o TrajetSimple.o TrajetCompose.o ListeDeTrajet.o
 	g++ -o trajets main.o Trajet.o TrajetSimple.o TrajetCompose.o ListeDeTrajet.o
 
 MAP: CXXFLAGS += -DMAP

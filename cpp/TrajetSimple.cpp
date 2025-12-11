@@ -28,6 +28,18 @@ void TrajetSimple::Print() const
 
 //-------------------------------------------- Constructeurs - destructeur
 
+TrajetSimple::TrajetSimple (const TrajetSimple & unTrajetSimple ) : Trajet(unTrajetSimple.GetStart(), unTrajetSimple.GetEnd())
+// Algorithme :
+//
+{
+    #ifdef MAP
+        cout << "Appel au constructeur de copie de <TrajetSimple>" << endl;
+    #endif
+
+    moyenDeTransport = new char[100];
+    strcpy(moyenDeTransport, unTrajetSimple.GetMoyenDeTransport());
+}
+
 TrajetSimple::TrajetSimple(const char* start, const char* end, const char* Transport) : Trajet(start, end)
 // Algorithme :
 //
@@ -37,7 +49,6 @@ TrajetSimple::TrajetSimple(const char* start, const char* end, const char* Trans
     #endif
 
     moyenDeTransport = new char[100];
-
     strcpy(moyenDeTransport, Transport);
 }
 
