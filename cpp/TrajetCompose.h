@@ -13,8 +13,9 @@
 
 //------------------------------------------------------------------------
 // Rôle de la classe <TrajetCompose>
-//
-//
+//      -> Hérite de la classe Trajet
+//      Implemente un trajet composée, qui gère une liste de trajets
+//      simples avec possibilité d'ajouter des trajets à cette liste.
 //------------------------------------------------------------------------
 
 class TrajetCompose : public Trajet
@@ -25,15 +26,19 @@ public:
 //----------------------------------------------------- Méthodes publiques
     void Print() const;
     // Mode d'emploi :
-    //
+    //      Affiche à l'utilisateurs les informations du TrajetCompose.
+    //      (Ville d'arrivée et de départ) et toutes les informations des
+    //      TrajetSimples composant le TrajetCompose.
     // Contrat :
     //
 
     void AddTrajet(const char * start, const char * end, const char * moyenDeTransport);
     // Mode d'emploi :
-    //
+    //		Crée un TrajetSimple et l'ajoute à la liste de trajets
+	//		composant notre TrajetCompose.
     // Contrat d'efficacité :
-    //     Il faut que le trajet soit valide, c'est à dire que chaque ville de départ soit la ville d'arrivée du trajet précédent.
+    //      Il faut que le trajet soit valide, c'est à dire que chaque
+    //      ville de départ soit la ville d'arrivée du trajet précédent.
 
 //------------------------------------------------- Surcharge d'opérateurs
 
@@ -42,13 +47,13 @@ public:
 
     TrajetCompose ();
     // Mode d'emploi :
-    // 
+    // 		Initialise une ListeDeTrajet vide
     // Contrat :
     // 
 
     virtual ~TrajetCompose ( );
     // Mode d'emploi :
-    //
+    //		Détruit la ListeDeTrajet associée au TrajetCompose
     // Contrat :
     //
 
@@ -59,10 +64,9 @@ protected:
 
 //----------------------------------------------------- Attributs protégés
 
-    ListeDeTrajet *listeDeTrajet;
+    ListeDeTrajet *listeDeTrajet; // Liste des trajets composant le TrajetCompose
 };
 
 //-------------------------------- Autres définitions dépendantes de <TrajetCompose>
 
-#endif // TrajetCompose_H
-
+#endif

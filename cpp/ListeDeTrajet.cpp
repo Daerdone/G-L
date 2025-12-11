@@ -9,7 +9,6 @@ using namespace std;
 
 //------------------------------------------------------ Include personnel
 #include "ListeDeTrajet.h"
-#include "Trajet.h"
 #include "TrajetSimple.h"
 #include "TrajetCompose.h"
 
@@ -20,8 +19,9 @@ using namespace std;
 //----------------------------------------------------- Méthodes publiques
 
 void ListeDeTrajet::AskNewTrajet()
+// Algorithme :
+//
 {
-
     cout << endl << "Voulez vous créer un trajet simple (s) ou composé ? (c)" << endl;
     cout << ">> ";
     char type;
@@ -91,6 +91,8 @@ void ListeDeTrajet::AskNewTrajet()
 }
 
 void ListeDeTrajet::AskSearch() const
+// Algorithme :
+//
 {
     char* start = new char[100];
     char* end = new char[100];
@@ -118,7 +120,7 @@ void ListeDeTrajet::Print(int indLvl) const
     {
         if (current->value != NULL)
         {
-            for (int i = 0; i < indLvl; cout << "   ", i++) {}
+            for (int i = 0; i < indLvl; cout << "   ", i++) {} // Indentations
             cout << "- ";
             (current->value)->Print();
         }
@@ -133,14 +135,7 @@ const char* ListeDeTrajet::GetStart() const
 
 const char* ListeDeTrajet::GetEnd() const
 {
-    elem* current = listTrajet;
-
-    while (current->next != NULL)
-    {   
-        current = current->next;
-    }
-    
-    return current->value->GetEnd();
+    return endList->value->GetEnd();
 }
     
 //------------------------------------------------- Surcharge d'opérateurs

@@ -17,8 +17,9 @@ typedef struct elem {
 
 //------------------------------------------------------------------------
 // Rôle de la classe <ListeDeTrajet>
-//
-//
+//      Classe représentant une liste chaînée de trajets.
+//      Permet d'ajouter des trajets, d'afficher la liste,
+//      et de rechercher des trajets entre deux villes.
 //------------------------------------------------------------------------
 
 class ListeDeTrajet
@@ -27,56 +28,52 @@ class ListeDeTrajet
 
 public:
 //----------------------------------------------------- Méthodes publiques
-    
 
     void Print (int indLvl) const;
     // Mode d'emploi :
+    //      indLvl -> Niveau d'indentation pour l'affichage
     //
+    //      Affiche la liste des trajets avec un niveau d'indentation donné.
     // Contrat :
     //
 
     void AskNewTrajet();
     // Mode d'emploi :
-    //      
+    //      Demande à l'utilisateur de saisir un nouveau trajet.
     // Contrat :
     // 
 
     void AskSearch() const;
     // Mode d'emploi :
-    //      
+    //      Demande à l'utilisateur de saisir les villes de départ
+    //      et d'arrivée pour une recherche.
     // Contrat :
     // 
 
     const char* GetStart() const;
     // Mode d'emploi :
-    //      
-    // Contrat :
-    // 
+    //      Retourne la ville de départ du premier trajet de la liste.
+    // Contrat d'efficacité :
+    //      La liste n'est pas vide.
 
     const char* GetEnd() const;
     // Mode d'emploi :
-    //      
-    // Contrat :
-    // 
-
-    void Add (const Trajet * newTrajet);
-    // Mode d'emploi :
-    //
-    // Contrat :
-    //
+    //      Retourne la ville d'arrivée du dernier trajet de la liste.
+    // Contrat d'efficacité :
+    //      La liste n'est pas vide.
 
 //------------------------------------------------- Surcharge d'opérateurs
 
 //-------------------------------------------- Constructeurs - destructeur
     ListeDeTrajet ( );
     // Mode d'emploi :
-    //
+    //      Initialise une liste de trajets vide.
     // Contrat :
     //
 
     virtual ~ListeDeTrajet ( );
     // Mode d'emploi :
-    //
+    //      Libère la mémoire allouée pour la liste des trajets.
     // Contrat :
     //
 
@@ -86,18 +83,23 @@ protected:
 //----------------------------------------------------- Méthodes protégées
     void Search (const char* start, const char* end) const;
     // Mode d'emploi :
-    //      
+    //      Recherche des trajets entre deux villes données.
     // Contrat :
-    // result est une ListeDeTrajet déjà allouée
+    //
+
+    void Add (const Trajet * newTrajet);
+    // Mode d'emploi :
+    //    Ajoute un nouveau trajet à la fin de la liste.
+    // Contrat :
+    //
 
 //----------------------------------------------------- Attributs protégés
 
-    elem * listTrajet;
-    elem * endList;
+    elem * listTrajet; // Pointeur vers le premier élément de la liste
+    elem * endList; // Pointeur vers le dernier élément de la liste
 
 };
 
 //-------------------------------- Autres définitions dépendantes de <ListeDeTrajet>
 
-#endif // ListeDeTrajet_H
-
+#endif
