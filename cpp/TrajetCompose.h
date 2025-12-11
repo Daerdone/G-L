@@ -32,6 +32,12 @@ public:
     // Contrat :
     //
 
+    const ListeDeTrajet * GetListeDeTrajet() const;
+    // Mode d'emploi :
+    //      Renvoie un pointeur vers la liste de trajets composant le TrajetCompose.
+    // Contrat :
+    //
+    
     void AddTrajet(const char * start, const char * end, const char * moyenDeTransport);
     // Mode d'emploi :
     //		Crée un TrajetSimple et l'ajoute à la liste de trajets
@@ -44,6 +50,11 @@ public:
 
 //-------------------------------------------- Constructeurs - destructeur
 
+    TrajetCompose (const TrajetCompose & unTrajetCompose);
+    // Mode d'emploi :
+    // 		Constructeur de copie
+    // Contrat :
+    // 
 
     TrajetCompose ();
     // Mode d'emploi :

@@ -62,6 +62,12 @@ public:
     // Contrat d'efficacité :
     //      La liste n'est pas vide.
 
+    const elem * GetListTrajet() const;
+    // Mode d'emploi :
+    //      Renvoie un pointeur vers le premier élément de la liste.
+    // Contrat :
+    //
+
     void Add (const Trajet * newTrajet);
     // Mode d'emploi :
     //    Ajoute un nouveau trajet à la fin de la liste.
@@ -90,6 +96,13 @@ protected:
     void Search (const char* start, const char* end) const;
     // Mode d'emploi :
     //      Recherche des trajets entre deux villes données.
+    // Contrat :
+    //
+
+    bool DeepSearch (const char* start, const char* end) const;
+    // Mode d'emploi :
+    //      Recherche des trajets entre deux villes données,
+    //      en explorant toutes les combinaisons possibles.
     // Contrat :
     //
 

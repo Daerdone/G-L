@@ -104,7 +104,7 @@ void ListeDeTrajet::AskSearch() const
     cin >> end;
 
     cout << endl << "Résultats de la recherche :" << endl;
-    this->Search(start, end);
+    this->DeepSearch(start, end);
 
     delete[] start;
     delete[] end;
@@ -137,7 +137,12 @@ const char* ListeDeTrajet::GetEnd() const
 {
     return endList->value->GetEnd();
 }
-    
+
+const elem* ListeDeTrajet::GetListTrajet() const
+{
+    return this->listTrajet;
+}
+
 //------------------------------------------------- Surcharge d'opérateurs
 
 //-------------------------------------------- Constructeurs - destructeur
@@ -210,4 +215,47 @@ void ListeDeTrajet::Search(const char* start, const char* end) const
 
         current = current->next;
     }
+}
+
+bool ListeDeTrajet::DeepSearch(const char* start, const char* end) const
+// Algorithme :
+//
+{
+    elem* current = this->listTrajet;
+    bool success = false;
+    while (current != NULL)
+    {
+        if ((!strcmp(current->value->GetStart(), start)))
+        {
+            if ((!strcmp(current->value->GetEnd(), end)))
+            {
+                current->value->Print();
+                success = true;
+            }
+            else
+            {
+                // Vérifie qu'on ne boucle pas vers une ville déjà visitée
+                elem* currentStart = this->listTrajet;
+                while (currentStart->next != NULL && (!strcmp(currentStart->value->GetStart(), current->value->GetEnd())))
+                {
+                    currentStart = currentStart->next;
+                }
+
+                if (strcmp(currentStart->value->GetStart(), current->value->GetEnd()))
+                {
+                    // Recherche récursive à partir de la ville d'arrivée du trajet courant
+                    success = DeepSearch(current->value->GetEnd(), end);
+
+                    if (success)
+                    {
+                        current->value->Print();
+                    }
+                }
+            }
+        }
+
+        current = current->next;
+    }
+
+    return success;
 }

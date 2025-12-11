@@ -49,6 +49,24 @@ void TrajetCompose::AddTrajet(const char * start, const char * end, const char *
 
 //-------------------------------------------- Constructeurs - destructeur
 
+TrajetCompose::TrajetCompose(const TrajetCompose & unTrajetCompose) : Trajet()
+{
+    #ifdef MAP
+        cout << "Appel au constructeur de <TrajetCompose>" << endl;
+    #endif
+
+    listeDeTrajet = new ListeDeTrajet();
+
+    // Copie des trajets de la liste passée en paramètre
+    const ListeDeTrajet * listeParam = unTrajetCompose.GetListeDeTrajet();
+    strcpy(start, unTrajetCompose.GetStart());
+    strcpy(end, unTrajetCompose.GetEnd());
+
+    const elem * current = listeParam->GetListTrajet();
+
+    
+}
+
 TrajetCompose::TrajetCompose() : Trajet()
 {
     #ifdef MAP
