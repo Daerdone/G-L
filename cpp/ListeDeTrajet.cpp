@@ -146,7 +146,8 @@ void ListeDeTrajet::AskSave() const
     cout << "- [n,m] : selon les indices n et m des trajets dans le catalogue (ex: 0,3)" << endl;
     cout << ">> ";
     cin >> criteria;
-
+    
+    // Il faudrait faire une boucle pour redemander en cas d'erreur, mais pour l'instant on fait simple
     if (criteria.length() == 0)
     {
         cout << "Critères invalides. Retour au menu." << endl;
@@ -161,8 +162,14 @@ void ListeDeTrajet::AskSave() const
         size_t commaPos = criteria.find(',');
         size_t endBracketPos = criteria.find(']');
 
-        int n = stoi(criteria.substr(1, commaPos - 1));
-        int m = stoi(criteria.substr(commaPos + 1, endBracketPos - commaPos - 1));
+        int n = stoi(criteria.substr(1, commaPos - 1)) - 1; // -1 pour avoir un index basé à 0
+        int m = stoi(criteria.substr(commaPos + 1, endBracketPos - commaPos - 1)) - 1;
+        
+        if (n < 0 || m < 0 || n >= nbrTrajet || m >= nbrTrajet || n > m)
+        {
+            cout << "Indices invalides. Retour au menu." << endl;
+            return;
+        }
 
         SaveToFile(filename, n, m);
     }
@@ -195,24 +202,31 @@ void ListeDeTrajet::SaveToFile(const string & filename, const char & criteria) c
     }
     else
     {
-        file << nbrTrajet << endl;
+        int count = 0;
         elem* current = this->listTrajet;
+
+        file << "0" << endl; // Placeholder pour le nombre de trajets sauvegardés
+
         while (current != NULL)
         {
             if (current->value->GetType() == 0 && (criteria == 'a' || criteria == 's'))
             {
                 const TrajetSimple* trajetS = dynamic_cast <const TrajetSimple*> (current->value);
                 file << "0," << trajetS->GetStart() << "," << trajetS->GetEnd() << "," << trajetS->GetMoyenDeTransport() << endl;
+                count++;
             }
             else if (current->value->GetType() == 1 && (criteria == 'a' || criteria == 'c'))
             {
                 const TrajetCompose* trajetC = dynamic_cast <const TrajetCompose*> (current->value);
-                
                 trajetC->WriteInOfstream(file);
+                count++;
             }
             current = current->next;
         }
 
+        // On remonte au début du fichier pour écrire le nombre de trajets sauvegardés
+        file.seekp(0, ios::beg);
+        file << count;
         file.close();
         cout << "Catalogue sauvegardé dans " << filename << " selon le critère '" << criteria << "'." << endl;
     }
@@ -222,12 +236,46 @@ void ListeDeTrajet::SaveToFile(const string & filename, int indice_deb, int indi
 // Algorithme :
 //
 {
-    cout << "Fonctionnalité non implémentée pour l'instant." << endl;
+    ofstream file(filename);
+    if (!file.is_open())
+    {
+        cout << "Erreur lors de l'ouverture du fichier. Retour au menu." << endl;
+    }
+    else
+    {
+        file << (indice_fin - indice_deb + 1) << endl;
+        elem* current = this->listTrajet;
+        int index = 0;
+        while (current != NULL)
+        {
+            if (index >= indice_deb && index <= indice_fin)
+            {
+                if (current->value->GetType() == 0)
+                {
+                    const TrajetSimple* trajetS = dynamic_cast <const TrajetSimple*> (current->value);
+                    file << "0," << trajetS->GetStart() << "," << trajetS->GetEnd() << "," << trajetS->GetMoyenDeTransport() << endl;
+                }
+                else if (current->value->GetType() == 1)
+                {
+                    const TrajetCompose* trajetC = dynamic_cast <const TrajetCompose*> (current->value);
+                    
+                    trajetC->WriteInOfstream(file);
+                }
+            }
+            current = current->next;
+            index++;
+        }
+
+        file.close();
+        cout << "Catalogue sauvegardé dans " << filename << " pour les indices [" << indice_deb << "," << indice_fin << "]." << endl;
+    }
 }
 
 void ListeDeTrajet::SaveToFile(const string & filename, const string & startCity, const string & endCity) const
+// Algorithme :
+//
 {
-    cout << "Fonctionnalité non implémentée pour l'instant." << endl;
+    cout << "Fonction non implémentée. Retour au menu." << endl;  
 }
 
 void ListeDeTrajet::WriteInOfstream(ofstream & file) const
